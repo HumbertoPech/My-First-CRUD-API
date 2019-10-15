@@ -9,6 +9,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Console\Artisan;
+use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\Products as ProductCollection;
 
 class ProductTest extends TestCase
 {
@@ -29,8 +31,13 @@ class ProductTest extends TestCase
     {
         // Given data of a product
         $productData = [
-            'name' => 'Product 3',
-            'price' => '99.99'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product 3',
+                    'price' => '99.99'
+                ]
+            ]
         ];
 
         // When
@@ -41,16 +48,34 @@ class ProductTest extends TestCase
         $response->assertStatus(201);
         // Assert if the response has the correct structure
         $response->assertJsonStructure([
-            'id',
-            'name',
-            'price'
+            'data'=> [
+                'type',
+                'id',
+                'attributes' => [
+                    'name',
+                    'price'
+                ],
+                'links' => [
+                    "self"
+                ]
+            ],
         ]);
         $body = $response->decodeResponseJson();
         // Assert the product was created with the correct data
+        //$response -> assertJson((new ProductResource(Product::find(1)))->toArray()); //Test later...
+        //$response -> assertJson($productData);
         $response->assertJsonFragment([
-            'id' => $body['id'],
-            'name' => 'Product 3',
-            'price' => '99.99'
+            'data' => [
+                'type' => 'products',
+                'id' => $body['data']['id'],
+                'attributes' => [
+                    'name' => 'Product 3',
+                    'price' => '99.99'
+                ],
+                'links' => [
+                    "self" => "http://blog.test/api/products/".$body['data']['id']
+                ]
+            ]
         ]);
     }
 
@@ -60,7 +85,12 @@ class ProductTest extends TestCase
     public function test_client_cannot_create_a_product_without_name(){
         // Given data without value of name (or without the attribute) of the product
         $productData = [
-            'price' => '199.99'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'price' => '99.99'
+                ]
+            ]
         ];
 
         // When
@@ -94,7 +124,12 @@ class ProductTest extends TestCase
     public function test_client_cannot_create_a_product_without_price(){
        // Given data without value of price (or without the attribute) of the product
        $productData = [
-            'name' => 'Product X'
+        'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X'
+                ]
+            ]
         ];
 
         // When
@@ -125,8 +160,13 @@ class ProductTest extends TestCase
     public function test_client_cannot_create_a_product_if_price_is_not_numeric(){
         // Given data of one product, but the price is not numeric
         $productData = [
-             'name' => 'Product X',
-             'price' => 'CincoPeso'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => 'CinkoPeso'
+                ]
+            ]
          ];
  
          // When
@@ -157,9 +197,14 @@ class ProductTest extends TestCase
     public function test_client_cannot_create_a_product_if_price_is_less_or_equal_than_zero(){
         // Given data of one product, but the price is less or equal than zero
         $productData = [
-             'name' => 'Product X',
-             'price' => '-99.99'
-         ];
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => '-99.99'
+                ]
+            ]
+        ];
  
          // When
          $response = $this->json('POST', '/api/products', $productData);
@@ -190,8 +235,13 @@ class ProductTest extends TestCase
     {
         // Given data to update a product
         $productData = [
-            'name' => 'Product X',
-            'price' => '89.99'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => '89.99'
+                ]
+            ]
         ];
         //And there is a product with id = 1 in the application
         $id = 1;
@@ -203,17 +253,32 @@ class ProductTest extends TestCase
         $response->assertStatus(200);
         // Assert if the response has the correct structure
         $response->assertJsonStructure([
-            'id',
-            'name',
-            'price'
+            'data'=> [
+                'type',
+                'id',
+                'attributes' => [
+                    'name',
+                    'price'
+                ],
+                'links' => [
+                    "self"
+                ]
+            ],
         ]);
         // Assert the product was update with the correct data
         $response->assertJsonFragment([
-            'id' => $id,
-            'name' => 'Product X',
-            'price' => '89.99'
-        ]);
-        
+            'data' => [
+                'type' => 'products',
+                'id' => $id,
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => '89.99'
+                ],
+                'links' => [
+                    "self" => "http://blog.test/api/products/".$id
+                ]
+            ]
+        ]);       
     }
 
     /**
@@ -223,8 +288,13 @@ class ProductTest extends TestCase
     {
         // Given data to update a product, but the price is not numeric
         $productData = [
-            'name' => 'Product X',
-            'price' => 'CinkoPeso'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => 'CinkoPeso'
+                ]
+            ]
         ];
         //And there is a product with id = 1 in the application
         $id = 1;
@@ -257,8 +327,13 @@ class ProductTest extends TestCase
     {
         // Given data to update a product, but the price is less or equal than zero
         $productData = [
-            'name' => 'Product X',
-            'price' => '-56.90'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => '-59.99'
+                ]
+            ]
         ];
         //And there is a product with id = 1 in the application
         $id = 1;
@@ -291,8 +366,13 @@ class ProductTest extends TestCase
     {
         // Given data to update a product
         $productData = [
-            'name' => 'Product X',
-            'price' => '56.90'
+            'data' => [
+                'type' => 'products',
+                'attributes' => [
+                    'name' => 'Product X',
+                    'price' => '56.90'
+                ]
+            ]
         ];
         //And there is not a product with id = 10 in the application
         $id = 10;
@@ -334,15 +414,31 @@ class ProductTest extends TestCase
         $response->assertStatus(200);
         // Assert the response has the correct structure
         $response->assertJsonStructure([
-            'id',
-            'name',
-            'price'
+            'data'=> [
+                'type',
+                'id',
+                'attributes' => [
+                    'name',
+                    'price'
+                ],
+                'links' => [
+                    "self"
+                ]
+            ],
         ]);
         // Assert the product was returned with the correct data
         $response->assertJsonFragment([
-            'id' => $id,
-            'name' => 'Product 2',
-            'price' => '29.99'
+            'data' => [
+                'type' => 'products',
+                'id' => $id,
+                'attributes' => [
+                    'name' => 'Product 2',
+                    'price' => '29.99'
+                ],
+                'links' => [
+                    "self" => "http://blog.test/api/products/".$id
+                ]
+            ]
         ]);
     }
 
@@ -432,22 +528,31 @@ class ProductTest extends TestCase
         // When
         $response = $this->json('GET', '/api/products'); 
 
-        $this->artisan('migrate:refresh');
         // Then
         // Assert if it sends the correct HTTP Status
         $response->assertStatus(200);
         // Assert if the response has the correct structure
         $response->assertJsonStructure(
             [
-                [
-                    'id',
-                    'name',
-                    'price'
-                ]
+               'data' => [
+                   [
+                        'data'=> [
+                            'type',
+                            'id',
+                            'attributes' => [
+                                'name',
+                                'price'
+                            ],
+                            'links' => [
+                                "self"
+                            ]
+                        ],
+                    ],
+               ]
             ]
         );
         // Assert the products were sent correctly
-        $response->assertJson(Product::all()->toArray());
+        //$response->assertJson(Product::all()->toArray());
         
     }
 

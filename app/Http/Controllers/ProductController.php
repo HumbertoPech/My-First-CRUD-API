@@ -6,6 +6,8 @@ use App\Product;
 use App\Http\Requests\ProductRules;
 use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\Products as ProductCollection;
 
 class ProductController extends Controller
 {
@@ -21,7 +23,8 @@ class ProductController extends Controller
         $rows = Product::count();
         if($rows>0){
             $products = Product::all();
-            return response()->json($products,200);
+            //return response()->json($products,200);
+            return response()->json(new ProductCollection($products), 200);
         }
         //else send an empty array
         return response()->json([],200);
@@ -47,14 +50,17 @@ class ProductController extends Controller
     {
         //All the attributes were validated before entering the method 
         //by the corresponding Form Request
-        $validated = $request->validated();
+        //$validated = $request->validated();
 
         //Create a new product
-        $product = Product::create($request->all());
+        $product = Product::create($request->__get('data.attributes'));
+        //$product->name = $request->input('data.attributes.name'); //this way is the same
+        //$product->price = $request->input('data.attributes.price');
+        //$product->save();
 
         //Return a response with a product json
         //representation and a 201 status code
-        return response()->json($product,201);
+        return response()->json(new ProductResource($product),201);
     }
 
     /**
@@ -69,7 +75,8 @@ class ProductController extends Controller
         $product = Product::find($id);
         //if the product exist then send a response with a 200 status and the product 
         if($product){
-            return response()->json($product,200);
+            //return response()->json($product,200);
+            return response()->json(new ProductResource($product), 200);
         }
         //else send a response with a 404 status
         $response = [
@@ -109,10 +116,11 @@ class ProductController extends Controller
         $product = Product::find($id);
         if($product){
             //Then assign all the variables and save the product
-            $product->name = $request->input('name');
-            $product->price = $request->input('price');
+            $product->name = $request->input('data.attributes.name');
+            $product->price = $request->input('data.attributes.price');
             $product->save();
-            return response()->json($product,200);
+            //return response()->json($product,200);
+            return response()->json(new ProductResource($product), 200);
         }
          //else send a response with a 404 status
         $response = [

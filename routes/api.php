@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Product;
+use App\Http\Resources\Product as ProductResource;
+use App\Http\Resources\Products as ProductCollection;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +33,15 @@ Route::put('products/{id}', "ProductController@update");
 Route::delete('products/{id}', "ProductController@destroy");
 
 Route::get('products/{id}', "ProductController@show");
+
+/*Route::get('/producto', function(){
+    return new ProductCollection(Product::all());
+});*/
+
+Route::get('/producto', function(){
+    return new ProductResource(Product::find(1));
+});
+
+Route::get('/productos', function(){
+    return ProductResource::collection(Product::all()->keyBy->id);
+});

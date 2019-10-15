@@ -26,8 +26,8 @@ class ProductRules extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'price' => 'bail|required|numeric|gt:0'
+            'data.attributes.name' => 'required',
+            'data.attributes.price' => 'bail|required|numeric|gt:0'
         ];
     }
 
@@ -37,11 +37,12 @@ class ProductRules extends FormRequest
      * @return array
      */
     public function messages(){
+        $prefix = 'data.attributes.';
         return [
-            'name.required' => 'The product name is neccesary',
-            'price.required' => 'The product price is neccesary',
-            'price.numeric' => 'The price should be numeric',
-            'price.gt' => 'The price must be greater than zero'
+            $prefix.'name.required' => 'The product name is neccesary',
+            $prefix.'price.required' => 'The product price is neccesary',
+            $prefix.'price.numeric' => 'The price should be numeric',
+            $prefix.'price.gt' => 'The price must be greater than zero'
         ];
     }
 
@@ -66,5 +67,12 @@ class ProductRules extends FormRequest
             array_push($response['errors'], $arrayTemp);
         }
         throw new HttpResponseException(response()->json($response,422));
+    }
+
+    public function attributes(){
+        return [
+            'data.attributes.name' => 'name',
+            'data.attributes.price' => 'price'
+        ];
     }
 }
