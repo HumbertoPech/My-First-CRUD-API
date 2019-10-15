@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Product;
+use App\Http\Requests\ProductRules;
 use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ProductController extends Controller
 {
@@ -14,7 +16,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        //If  there is more than 0 rows, search 
+        //all the products and send them
+        $rows = Product::count();
+        if($rows>0){
+            $products = Product::all();
+            return response()->json($products,200);
+        }
+        //else send an empty array
+        return response()->json([],200);
     }
 
     /**
@@ -33,8 +43,12 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRules $request)
     {
+        //All the attributes were validated before entering the method 
+        //by the corresponding Form Request
+        $validated = $request->validated();
+
         //Create a new product
         $product = Product::create($request->all());
 
@@ -49,16 +63,26 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product, $id)
+    public function show($id)
     {
         //Look up for the product with the $id
         $product = Product::find($id);
-        //if the product exist then send a response with a 200 status and the product
-        //else send a response with a 204 status
+        //if the product exist then send a response with a 200 status and the product 
         if($product){
             return response()->json($product,200);
         }
-        return response()->json(204);
+        //else send a response with a 404 status
+        $response = [
+            'errors' => [
+                [
+                    'code' => 'ERROR-2',
+                    'title' => 'Not Found',
+                    'detail' => 'There is not a product with the id: '.$id
+                ]
+            ]
+        ];
+        return response()->json($response,404);    
+        //throw new HttpResponseException(response()->json($response), 404);
     }
 
     /**
@@ -79,7 +103,7 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product, $id)
+    public function update(ProductRules $request, $id)
     {
         //First find the product to be updated
         $product = Product::find($id);
@@ -88,9 +112,19 @@ class ProductController extends Controller
             $product->name = $request->input('name');
             $product->price = $request->input('price');
             $product->save();
-            return response()->json(200);
+            return response()->json($product,200);
         }
-         return response()->json(204);        
+         //else send a response with a 404 status
+        $response = [
+            'errors' => [
+                [
+                    'code' => 'ERROR-2',
+                    'title' => 'Not Found',
+                    'detail' => 'There is not a product with the id: '.$id
+                ]
+            ]
+        ];
+        return response()->json($response,404);       
     }
 
     /**
@@ -99,7 +133,7 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product, $id)
+    public function destroy($id)
     {
         //Look up for the product with the $id
         $product = Product::find($id);
@@ -107,8 +141,18 @@ class ProductController extends Controller
         //else send a response with a 204 status
         if($product){
             $product->delete();
-            return response()->json(200);
+            return response()->json('',204);
         }
-        return response()->json(204);
+        //else send a response with a 404 status
+        $response = [
+            'errors' => [
+                [
+                    'code' => 'ERROR-2',
+                    'title' => 'Not Found',
+                    'detail' => 'There is not a product with the id: '.$id
+                ]
+            ]
+        ];
+        return response()->json($response,404);
     }
 }

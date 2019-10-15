@@ -21,6 +21,8 @@ Route::get('/greeting', function (Request $request){
     return 'Hello World!';
 });
 
+Route::get('products', "ProductController@index");
+
 Route::post('products', "ProductController@store");
 
 Route::put('products/{id}', "ProductController@update");
