@@ -431,8 +431,7 @@ class ProductTest extends TestCase
 
         // When
         $response = $this->json('GET', '/api/products'); 
-
-        $this->artisan('migrate:refresh');
+        
         // Then
         // Assert if it sends the correct HTTP Status
         $response->assertStatus(200);
