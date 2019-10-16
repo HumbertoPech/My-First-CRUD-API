@@ -60,7 +60,7 @@ class ProductController extends Controller
 
         //Return a response with a product json
         //representation and a 201 status code
-        return response()->json(new ProductResource($product),201);
+        return (new ProductResource($product))->response()->setStatusCode(201);
     }
 
     /**
@@ -76,7 +76,7 @@ class ProductController extends Controller
         //if the product exist then send a response with a 200 status and the product 
         if($product){
             //return response()->json($product,200);
-            return response()->json(new ProductResource($product), 200);
+            return new ProductResource($product);
         }
         //else send a response with a 404 status
         $response = [
@@ -120,7 +120,7 @@ class ProductController extends Controller
             $product->price = $request->input('data.attributes.price');
             $product->save();
             //return response()->json($product,200);
-            return response()->json(new ProductResource($product), 200);
+            return new ProductResource($product);
         }
          //else send a response with a 404 status
         $response = [

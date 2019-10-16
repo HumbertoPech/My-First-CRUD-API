@@ -10,7 +10,7 @@ class Product extends JsonResource
      * Indicates if the resource's collection keys should be preserved
      * @var bool
      */
-    public $preserveKeys = true;
+    //public $preserveKeys = true;
 
     /**
      * Transform the resource into an array.
@@ -22,16 +22,14 @@ class Product extends JsonResource
     {
         //return parent::toArray($request);
         return [
-            'data' => [ 
-                'type' => 'products',
-                'id' => $this->id,
-                'attributes' => [
-                    'name' => $this->name,
-                    'price' => $this->price
-                ],
-                'links' => [
-                    'self' => 'http://blog.test/api/products/'.$this->id
-                ]
+            'type' => 'products',
+            'id' => $this->id,
+            'attributes' => [
+                'name' => $this->name,
+                'price' => $this->price
+            ],
+            'links' => [
+                'self' => 'http://blog.test/api/products/'.$this->id
             ]
         ];
     }

@@ -86,7 +86,7 @@
 
                 <div class="links">
                     <a href="https://github.com/HumbertoPech">My Github</a>
-                    <a href="fb.com/profile">Tu</a>
+                    <a href="https://fb.com/profile">Tu</a>
                 </div>
             </div>
         </div>

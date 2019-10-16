@@ -536,19 +536,17 @@ class ProductTest extends TestCase
             [
                'data' => [
                    [
-                        'data'=> [
-                            'type',
-                            'id',
-                            'attributes' => [
-                                'name',
-                                'price'
-                            ],
-                            'links' => [
-                                "self"
-                            ]
+                        'type',
+                        'id',
+                        'attributes' => [
+                            'name',
+                            'price'
                         ],
+                        'links' => [
+                            "self"
+                        ]
                     ],
-               ]
+                ],
             ]
         );
         // Assert the products were sent correctly
@@ -575,6 +573,8 @@ class ProductTest extends TestCase
             [
             ]
         );
+        // Assert if it sends any products in the response body
+        $response->assertJsonCount(0);
     }
 
     public function tearDown(): void
